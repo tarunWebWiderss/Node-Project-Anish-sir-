@@ -1,13 +1,12 @@
-const User = require('../models/user.model');
+const userService = require('../services/user.service');
+const tokenBlacklist = require('../utils/tokenBlacklist');
 
 exports.getMe = async (req, res) => {
     try {
-        const user = await User.findByPk(req.user.id);
+        const user = await userService.getMe(req.user.id);
         res.status(200).json({
             status: 1,
-            data: {
-                user
-            }
+            data: { user }
         });
     } catch (error) {
         res.status(400).json({
@@ -19,13 +18,11 @@ exports.getMe = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await userService.getAllUsers();
         res.status(200).json({
             status: 1,
             results: users.length,
-            data: {
-                users
-            }
+            data: { users }
         });
     } catch (error) {
         res.status(400).json({
@@ -37,31 +34,19 @@ exports.getAllUsers = async (req, res) => {
 
 exports.updateMe = async (req, res) => {
     try {
-        // Prevent password update on this route
         if (req.body.password) {
             return res.status(400).json({
                 status: 0,
                 message: 'This route is not for password updates. Please use /updatePassword'
             });
         }
-
-        await User.update(
-            {
-                name: req.body.name,
-                email: req.body.email
-            },
-            {
-                where: { id: req.user.id },
-                individualHooks: true
-            }
-        );
-        const updatedUser = await User.findByPk(req.user.id);
-
+        const updatedUser = await userService.updateMe(req.user.id, {
+            name: req.body.name,
+            email: req.body.email
+        });
         res.status(200).json({
             status: 1,
-            data: {
-                user: updatedUser
-            }
+            data: { user: updatedUser }
         });
     } catch (error) {
         res.status(400).json({

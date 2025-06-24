@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>API Endpoints - Auth Service</title>
+  <style>
+    /* Basic Styles */
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at center, #222b4d, #0f0c29);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      cursor: none; /* Hide default cursor */
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, #00ffe0, #ffdf00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 20px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,255,255,0.1);
+      position: relative;
+      overflow: visible;
+    }
+
+    .main-url, .endpoint-header {
+      background-color: rgba(255, 255, 255, 0.08);
+      padding: 1rem;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      box-shadow: inset 0 0 10px rgba(0,255,255,0.15);
+    }
+
+    .copy-btn {
+      background-color: #ffd700;
+      color: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .copy-btn:hover {
+      background-color: #ffcc00;
+      transform: scale(1.05);
+    }
+
+    .copy-btn:active {
+      transform: scale(0.95);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: #1dd1a1;
+      color: #000;
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s ease;
+      pointer-events: none;
+      z-index: 100;
+      font-weight: bold;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Endpoint cards */
+    .endpoint {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 20px rgba(0,255,255,0.05);
+      position: relative;
+      opacity: 1;
+      transform: none;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    .endpoint:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px #00ffe5;
+      border-color: #00ffe5;
+      z-index: 10;
+    }
+
+    .method {
+      font-weight: bold;
+      color: #00ffd9;
+      font-size: 1.1rem;
+    }
+
+    pre {
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 10px;
+      color: #fff;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      user-select: text;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Circular rotating dashed border */
+    .endpoint::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border: 2px dashed #00ffe5;
+      border-radius: 50%;
+      top: -20px;
+      left: -20px;
+      opacity: 0.2;
+      animation: rotate 10s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Custom Cursor */
+
+    /* Outer ring */
+    #cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 50px;
+      height: 50px;
+      margin-left: -25px;  /* center on pointer */
+      margin-top: -25px;
+      border: 2px solid #00ffe5;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+      mix-blend-mode: difference;
+      z-index: 9999;
+      animation: ringPulse 2s infinite ease-in-out;
+    }
+
+    /* Inner dot */
+    #cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 10px;
+      height: 10px;
+      margin-left: -5px;
+      margin-top: -5px;
+      background-color: #00ffe5;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+      mix-blend-mode: difference;
+      box-shadow: 0 0 10px #00ffe5;
+    }
+
+    /* Pulsing animation for ring */
+    @keyframes ringPulse {
+      0%, 100% {
+        transform: scale(1);
+        border-color: #00ffe5;
+        background-color: transparent;
+      }
+      50% {
+        transform: scale(1.1);
+        border-color: #ffdf00;
+        background-color: rgba(255, 223, 0, 0.1);
+      }
+    }
+
+    /* Hover states on interactive elements */
+    .hovered #cursor-ring {
+      transform: scale(1.8);
+      border-color: #ffdf00;
+      background-color: rgba(255, 223, 0, 0.15);
+      animation: none;
+    }
+
+    .hovered #cursor-dot {
+      transform: scale(0);
+      background-color: transparent;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Auth API Documentation</h1>
+
+  <div class="container">
+
+    <!-- Base URL -->
+    <div class="main-url">
+      <code id="apiBase">http://localhost:3000</code>
+      <button class="copy-btn" onclick="copyBaseUrl()">Copy Base URL</button>
+    </div>
+
+    <!-- Endpoints -->
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">POST /api/auth/register</div>
+        <button class="copy-btn" onclick="copyUrl('/api/auth/register')">Copy</button>
+      </div>
+      <p>Register a new user.</p>
+      <pre>{
+  "name": "Test User",
+  "email": "taruna@yopmail.com",
+  "password": "12345678",
+  "role": "user"
+}</pre>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">POST /api/auth/login</div>
+        <button class="copy-btn" onclick="copyUrl('/api/auth/login')">Copy</button>
+      </div>
+      <p>Log in an existing user and receive a token.</p>
+      <pre>{
+  "email": "taruna@yopmail.com",
+  "password": "12345678"
+}</pre>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">GET /api/auth/dashboard</div>
+        <button class="copy-btn" onclick="copyUrl('/api/auth/dashboard')">Copy</button>
+      </div>
+      <p>Access a protected route. Requires a valid token.</p>
+      <pre>Authorization: Bearer &lt;token&gt;</pre>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">POST /api/auth/logout</div>
+        <button class="copy-btn" onclick="copyUrl('/api/auth/logout')">Copy</button>
+      </div>
+      <p>Invalidate the session or token.</p>
+      <pre>Authorization: Bearer &lt;token&gt;</pre>
+    </div>
+
+  </div>
+
+  <div class="footer">&copy; 2025 Auth API | All rights reserved</div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Custom Cursor Elements -->
+  <div id="cursor-ring"></div>
+  <div id="cursor-dot"></div>
+
+  <script>
+    const toast = document.getElementById('toast');
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function copyBaseUrl() {
+      const baseUrl = document.getElementById('apiBase').textContent;
+      navigator.clipboard.writeText(baseUrl).then(() => {
+        showToast('Base URL copied!');
+      });
+    }
+
+    function copyUrl(endpoint) {
+      const baseUrl = document.getElementById('apiBase').textContent;
+      const fullUrl = baseUrl + endpoint;
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        showToast(`Copied: ${fullUrl}`);
+      });
+    }
+
+    // Remove IntersectionObserver - endpoints are visible immediately
+
+    // Custom cursor logic
+    const cursorRing = document.getElementById('cursor-ring');
+    const cursorDot = document.getElementById('cursor-dot');
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let ringX = mouseX;
+    let ringY = mouseY;
+    let dotX = mouseX;
+    let dotY = mouseY;
+
+    const delay = 8; // delay factor for trailing effect
+
+    window.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+    });
+
+    function animate() {
+      ringX += (mouseX - ringX) / delay;
+      ringY += (mouseY - ringY) / delay;
+      cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Add/remove hover class on interactive elements
+    const hoverTargets = document.querySelectorAll('.endpoint, .copy-btn');
+
+    hoverTargets.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        document.body.classList.add('hovered');
+      });
+      el.addEventListener('mouseleave', () => {
+        document.body.classList.remove('hovered');
+      });
+    });
+
+  </script>
+
+</body>
+</html>

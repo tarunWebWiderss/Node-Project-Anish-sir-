@@ -2,6 +2,8 @@ const express = require('express');
 const sequelize = require('./config/database');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
+const categoryRoutes = require('./routes/category.routes');
+const productRoutes = require('./routes/product.routes');
 const { authenticateToken } = require('./middleware/auth.middleware');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -21,6 +23,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
 
 // Protected dashboard route
 app.get('/api/dashboard', authenticateToken, (req, res) => {
@@ -41,7 +45,6 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  console.log('API called for /');
   res.sendFile(path.join(__dirname, 'public', 'coming-soon.html'));
 });
 
@@ -56,4 +59,4 @@ sequelize.sync()
     })
     .catch((err) => {
         console.error('Unable to connect to the database:', err);
-    }); 
+    });

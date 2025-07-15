@@ -247,8 +247,7 @@
       <pre>{
   "name": "Test User",
   "email": "taruna@yopmail.com",
-  "password": "12345678",
-  "role": "user"
+  "password": "12345678"
 }</pre>
     </div>
 
@@ -280,6 +279,94 @@
       </div>
       <p>Invalidate the session or token.</p>
       <pre>Authorization: Bearer &lt;token&gt;</pre>
+    </div>
+
+    <!-- Category Endpoints -->
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">POST /api/categories</div>
+        <button class="copy-btn" onclick="copyUrl('/api/categories')">Copy</button>
+      </div>
+      <p>Create a new category. <b>JWT required</b></p>
+      <pre>{
+  "name": "Electronics",
+  "description": "Electronic items and gadgets"
+}</pre>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">GET /api/categories</div>
+        <button class="copy-btn" onclick="copyUrl('/api/categories')">Copy</button>
+      </div>
+      <p>Get all categories.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">PUT /api/categories/:id</div>
+        <button class="copy-btn" onclick="copyUrl('/api/categories/:id')">Copy</button>
+      </div>
+      <p>Update a category. <b>JWT required</b></p>
+      <pre>{
+  "name": "Updated Electronics",
+  "description": "Updated description"
+}</pre>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">DELETE /api/categories/:id</div>
+        <button class="copy-btn" onclick="copyUrl('/api/categories/:id')">Copy</button>
+      </div>
+      <p>Delete a category. <b>JWT required</b></p>
+    </div>
+
+    <!-- Product Endpoints -->
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">POST /api/products</div>
+        <button class="copy-btn" onclick="copyUrl('/api/products')">Copy</button>
+      </div>
+      <p>Create a new product. <b>JWT required</b></p>
+      <pre>{
+  "name": "iPhone 15 Pro",
+  "description": "Apple's new flagship phone",
+  "price": 1299.99,
+  "stock": 50,
+  "sku": "IPH15P-128GB",
+  "imageUrl": "https://example.com/iphone15.jpg",
+  "categoryId": "1"
+}</pre>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">GET /api/products</div>
+        <button class="copy-btn" onclick="copyUrl('/api/products')">Copy</button>
+      </div>
+      <p>Get all products. Supports <code>?category=</code>, <code>?search=</code>, <code>?page=</code>, <code>?limit=</code> query params.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">GET /api/products/:id</div>
+        <button class="copy-btn" onclick="copyUrl('/api/products/:id')">Copy</button>
+      </div>
+      <p>Get product by ID.</p>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">PUT /api/products/:id</div>
+        <button class="copy-btn" onclick="copyUrl('/api/products/:id')">Copy</button>
+      </div>
+      <p>Update a product. <b>JWT required</b></p>
+      <pre>{
+  "price": 1199.99,
+  "stock": 45
+}</pre>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">DELETE /api/products/:id</div>
+        <button class="copy-btn" onclick="copyUrl('/api/products/:id')">Copy</button>
+      </div>
+      <p>Delete a product. <b>JWT required</b></p>
     </div>
 
   </div>

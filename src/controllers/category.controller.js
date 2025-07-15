@@ -1,54 +1,129 @@
 const categoryService = require('../services/category.service');
+const { sendResponse } = require('../utils/response');
 
 exports.createCategory = async (req, res) => {
   try {
     const category = await categoryService.createCategory(req.body);
-    res.status(201).json({
+    if (categoryExists) {
+      return sendResponse(res, {
+        status: 0,
+        message: 'Category already exists',
+        data: null,
+        httpCode: 400
+      });
+    }
+    return sendResponse(res, {
+      status: 1,
       message: 'Category created successfully',
-      category: {
-        _id: category.id,
-        name: category.name,
-        description: category.description
-      }
+      data: { category: category },
+      httpCode: 201
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendResponse(res, {
+      status: 0,
+      message: error.message || 'Failed to create category',
+      data: null,
+      httpCode: 500
+    });
   }
 };
 
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await categoryService.getAllCategories();
-    res.status(200).json(categories.map(cat => ({
-      _id: cat.id,
-      name: cat.name,
-      description: cat.description
-    })));
+    return sendResponse(res, {
+      status: 1,
+      message: 'Categories fetched successfully',
+      data: { categories },
+      httpCode: 200
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return sendResponse(res, {
+      status: 0,
+      message: error.message || 'Failed to fetch categories',
+      data: null,
+      httpCode: 500
+    });
+  }
+};
+
+exports.getCategoryById = async (req, res) => {
+  try {
+    const category = await categoryService.getCategoryById(req.params.id);
+    if (!category) {
+      return sendResponse(res, {
+        status: 0,
+        message: 'Category not found',
+        data: null,
+        httpCode: 404
+      });
+    }
+    return sendResponse(res, {
+      status: 1,
+      message: 'Category fetched successfully',
+      data: { category },
+      httpCode: 200
+    });
+  } catch (error) {
+    return sendResponse(res, {
+      status: 0,
+      message: error.message || 'Failed to fetch category',
+      data: null,
+      httpCode: 500
+    });
   }
 };
 
 exports.updateCategory = async (req, res) => {
   try {
-    const result = await categoryService.updateCategory(req.params.id, req.body);
-    if (result[0] === 0) {
-      return res.status(404).json({ message: 'Category not found' });
+    const category = await categoryService.updateCategory(req.params.id, req.body);
+    if (!category) {
+      return sendResponse(res, {
+        status: 0,
+        message: 'Category not found',
+        data: null,
+        httpCode: 404
+      });
     }
-    res.status(200).json({ message: 'Category updated successfully' });
+    return sendResponse(res, {
+      status: 1,
+      message: 'Category updated successfully',
+      data: { category },
+      httpCode: 200
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendResponse(res, {
+      status: 0,
+      message: error.message || 'Failed to update category',
+      data: null,
+      httpCode: 500
+    });
   }
 };
 
 exports.deleteCategory = async (req, res) => {
   try {
     const deleted = await categoryService.deleteCategory(req.params.id);
-    if (deleted === 0) {
-      return res.status(404).json({ message: 'Category not found' });
+    if (!deleted) {
+      return sendResponse(res, {
+        status: 0,
+        message: 'Category not found',
+        data: null,
+        httpCode: 404
+      });
     }
-    res.status(200).json({ message: 'Category deleted successfully' });
+    return sendResponse(res, {
+      status: 1,
+      message: 'Category deleted successfully',
+      data: null,
+      httpCode: 200
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendResponse(res, {
+      status: 0,
+      message: error.message || 'Failed to delete category',
+      data: null,
+      httpCode: 500
+    });
   }
 }; 

@@ -6,7 +6,7 @@ function isValidUrl(url) {
 }
 
 const productService = {
-  createProduct: async (data) => {
+  createProduct: async (data, sellerId = null) => {
     if (!data.name || typeof data.name !== 'string') throw new Error('Name is required and must be a string');
     if (typeof data.price !== 'number' || data.price <= 0) throw new Error('Price is required and must be > 0');
     if (data.stock !== undefined && (typeof data.stock !== 'number' || data.stock < 0)) throw new Error('Stock must be >= 0');
@@ -19,6 +19,10 @@ const productService = {
     if (data.sku) {
       const existing = await productRepository.findOne({ where: { sku: data.sku } });
       if (existing) throw new Error('SKU already exists');
+    }
+    // Add seller ID if provided
+    if (sellerId) {
+      data.sellerId = sellerId;
     }
     return await productRepository.create(data);
   },
@@ -34,7 +38,7 @@ const productService = {
   getProductById: async (id) => {
     return await productRepository.findById(id);
   },
-  updateProduct: async (id, data) => {
+  updateProduct: async (id, data, userId = null, userRole = null) => {
     if (data.price !== undefined && (typeof data.price !== 'number' || data.price <= 0)) throw new Error('Price must be > 0');
     if (data.stock !== undefined && (typeof data.stock !== 'number' || data.stock < 0)) throw new Error('Stock must be >= 0');
     if (data.imageUrl && !isValidUrl(data.imageUrl)) throw new Error('imageUrl must be a valid URL');
@@ -42,9 +46,28 @@ const productService = {
       const cat = await categoryRepository.findOne({ where: { id: data.categoryId } });
       if (!cat) throw new Error('categoryId does not exist');
     }
+    
+    // Check ownership for sellers
+    if (userRole === 'seller' && userId) {
+      const product = await productRepository.findById(id);
+      if (!product) throw new Error('Product not found');
+      if (product.sellerId !== userId) {
+        throw new Error('You can only update your own products');
+      }
+    }
+    
     return await productRepository.update(id, data);
   },
-  deleteProduct: async (id) => {
+  deleteProduct: async (id, userId = null, userRole = null) => {
+    // Check ownership for sellers
+    if (userRole === 'seller' && userId) {
+      const product = await productRepository.findById(id);
+      if (!product) throw new Error('Product not found');
+      if (product.sellerId !== userId) {
+        throw new Error('You can only delete your own products');
+      }
+    }
+    
     return await productRepository.delete(id);
   }
 };

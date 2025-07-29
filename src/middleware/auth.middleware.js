@@ -31,14 +31,14 @@ exports.authenticateToken = async (req, res, next) => {
         // Grant access to protected route
         req.user = user;
         next();
-    } catch (error) {
-        return sendResponse(res, {
-            status: 0,
-            message: 'Invalid token',
-            data: null,
-            httpCode: 401
-        });
-    }
+            } catch (error) {
+            return sendResponse(res, {
+                status: 0,
+                message: 'Authentication failed',
+                data: null,
+                httpCode: 401
+            });
+        }
 };
 
 exports.restrictTo = (...roles) => {
@@ -47,6 +47,20 @@ exports.restrictTo = (...roles) => {
             return sendResponse(res, {
                 status: 0,
                 message: 'You do not have permission to perform this action',
+                data: null,
+                httpCode: 403
+            });
+        }
+        next();
+    };
+};
+
+exports.hasRole = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return sendResponse(res, {
+                status: 0,
+                message: 'Access denied: insufficient permissions',
                 data: null,
                 httpCode: 403
             });

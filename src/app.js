@@ -4,6 +4,10 @@ const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const categoryRoutes = require('./routes/category.routes');
 const productRoutes = require('./routes/product.routes');
+const orderRoutes = require('./routes/order.routes');
+const reviewRoutes = require('./routes/review.routes');
+const couponRoutes = require('./routes/coupon.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
 const { authenticateToken } = require('./middleware/auth.middleware');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -25,6 +29,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Protected dashboard route
 app.get('/api/dashboard', authenticateToken, (req, res) => {

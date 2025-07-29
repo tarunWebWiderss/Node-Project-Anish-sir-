@@ -246,8 +246,9 @@
       <p>Register a new user.</p>
       <pre>{
   "name": "Test User",
-  "email": "taruna@yopmail.com",
-  "password": "12345678"
+  "email": "user@example.com",
+  "password": "password123",
+  "role": "user" // or "admin", "seller"
 }</pre>
     </div>
 
@@ -325,7 +326,7 @@
         <div class="method">POST /api/products</div>
         <button class="copy-btn" onclick="copyUrl('/api/products')">Copy</button>
       </div>
-      <p>Create a new product. <b>JWT required</b></p>
+      <p>Create a new product. <b>JWT required (admin/seller)</b></p>
       <pre>{
   "name": "iPhone 15 Pro",
   "description": "Apple's new flagship phone",
@@ -333,7 +334,7 @@
   "stock": 50,
   "sku": "IPH15P-128GB",
   "imageUrl": "https://example.com/iphone15.jpg",
-  "categoryId": "1"
+  "categoryId": 1
 }</pre>
     </div>
     <div class="endpoint">
@@ -367,6 +368,55 @@
         <button class="copy-btn" onclick="copyUrl('/api/products/:id')">Copy</button>
       </div>
       <p>Delete a product. <b>JWT required</b></p>
+    </div>
+
+    <!-- Order Endpoints -->
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">POST /api/orders</div>
+        <button class="copy-btn" onclick="copyUrl('/api/orders')">Copy</button>
+      </div>
+      <p>Place a new order. <b>JWT required (user)</b></p>
+      <pre>{
+  "products": [
+    { "productId": 3, "quantity": 2 }
+  ],
+  "shippingAddress": "123 Main St, City, State 12345"
+}</pre>
+    </div>
+
+    <!-- Review Endpoints -->
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">POST /api/reviews</div>
+        <button class="copy-btn" onclick="copyUrl('/api/reviews')">Copy</button>
+      </div>
+      <p>Add a review for a product. <b>JWT required (user)</b></p>
+      <pre>{
+  "productId": 3,
+  "rating": 5,
+  "comment": "Excellent phone!"
+}</pre>
+    </div>
+
+    <!-- Coupon Endpoints -->
+    <div class="endpoint">
+      <div class="endpoint-header">
+        <div class="method">POST /api/coupons</div>
+        <button class="copy-btn" onclick="copyUrl('/api/coupons')">Copy</button>
+      </div>
+      <p>Create a new coupon. <b>JWT required (admin)</b></p>
+      <pre>{
+  "code": "DISCOUNT20",
+  "discountType": "percentage", // or "fixed"
+  "discountValue": 20,
+  "minOrderAmount": 100.00,
+  "maxDiscount": 200.00,
+  "usageLimit": 100,
+  "validFrom": "2024-01-01T00:00:00.000Z",
+  "validUntil": "2024-12-31T23:59:59.000Z",
+  "isActive": true
+}</pre>
     </div>
 
   </div>

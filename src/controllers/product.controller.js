@@ -3,15 +3,12 @@ const { sendResponse } = require('../utils/response');
 
 exports.createProduct = async (req, res) => {
   try {
-    const product = await productService.createProduct(req.body);
-    if (skuExists) {
-      return sendResponse(res, {
-        status: 0,
-        message: 'SKU already exists',
-        data: null,
-        httpCode: 400
-      });
-    }
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+    const sellerId = userRole === 'seller' ? userId : null;
+    
+    const product = await productService.createProduct(req.body, sellerId);
+    
     return sendResponse(res, {
       status: 1,
       message: 'Product created successfully',
@@ -59,7 +56,10 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
-    const product = await productService.updateProduct(req.params.id, req.body);
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+    
+    const product = await productService.updateProduct(req.params.id, req.body, userId, userRole);
     if (!product) {
       return sendResponse(res, {
         status: 0,
@@ -86,7 +86,10 @@ exports.updateProduct = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
   try {
-    const deleted = await productService.deleteProduct(req.params.id);
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+    
+    const deleted = await productService.deleteProduct(req.params.id, userId, userRole);
     if (!deleted) {
       return sendResponse(res, {
         status: 0,
